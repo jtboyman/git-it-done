@@ -4,6 +4,8 @@ let nameInputEl = document.querySelector('#username');
 let repoContainerEl = document.querySelector('#repos-container');
 let repoSearchTermEl = document.querySelector("#repo-search-term");
 
+let languageButtonsEl = document.querySelector('#language-buttons');
+
 let getUserRepos = function(user) {
     // format the github api url
     let apiUrl = "https://api.github.com/users/" + user + "/repos";
@@ -88,4 +90,32 @@ let displayRepos = function(repos, searchTerm) {
     }
 };
 
+let getFeaturedRepos = function(language) {
+    let apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                displayRepos(data.items, language);
+            });
+        }
+        else {
+            alert('Error: GitHub User Not Found');
+        }
+    });
+};
+
+//this is cool it's a way to use the parent to target the child buttons
+let buttonClickHandler = function(event) {
+    let language = event.target.getAttribute("data-language");
+    
+    if (language) {
+        getFeaturedRepos(language);
+
+        //clear old content
+        repoContainerEl.textContent = "";
+    }
+};
+
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
